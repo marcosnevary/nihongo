@@ -334,6 +334,8 @@
     /* fixed width so the dotted line always ends at the same x, whatever the numbers */
     flex: none;
     width: 5ch;
+    /* pulls the counts toward the accuracy column */
+    margin-right: -8px;
     font-size: 0.8rem;
     font-variant-numeric: tabular-nums;
   }
