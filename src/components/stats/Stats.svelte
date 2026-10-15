@@ -79,6 +79,12 @@
     misses: wordTotal.misses + kanaTotal.misses,
   })
 
+  /** blue when high, orange when poor, neutral in between or without answers (the percentage is always shown too) */
+  function level(tally: Tally): 'high' | 'low' | '' {
+    const a = accuracy(tally)
+    return a === null ? '' : a >= 0.8 ? 'high' : a < 0.6 ? 'low' : ''
+  }
+
   function reset() {
     if (confirm('Reset all statistics? This cannot be undone.')) stats = emptyStats()
   }
@@ -95,7 +101,7 @@
       <span class="label">Wrong</span>
     </div>
     <div class="tile">
-      <span class="value">{percent(accuracy(tally))}</span>
+      <span class="value {level(tally)}">{percent(accuracy(tally))}</span>
       <span class="label">Accuracy</span>
     </div>
     <div class="tile">
@@ -181,7 +187,7 @@
         <span class="jp" lang="ja">{row.symbol}</span>
         <span class="reading muted" lang={row.ja ? 'ja' : undefined}>{row.reading}</span>
         <span class="counts">✓{row.tally.hits} ✗{row.tally.misses}</span>
-        <span class="badge">{percent(accuracy(row.tally))}</span>
+        <span class="badge {level(row.tally)}">{percent(accuracy(row.tally))}</span>
       </li>
     {/each}
   </ul>
@@ -213,6 +219,12 @@
   .tile .label {
     font-size: 0.8rem;
     color: inherit;
+  }
+  .high {
+    color: var(--on);
+  }
+  .low {
+    color: var(--off);
   }
   .toolbar {
     display: flex;
