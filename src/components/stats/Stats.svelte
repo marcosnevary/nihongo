@@ -37,6 +37,10 @@
 
   const wordTotal = $derived(sumTallies(stats.words))
   const kanaTotal = $derived(sumTallies(stats.kana))
+  const total = $derived<Tally>({
+    hits: wordTotal.hits + kanaTotal.hits,
+    misses: wordTotal.misses + kanaTotal.misses,
+  })
 
   function reset() {
     if (confirm('Reset all statistics? This cannot be undone.')) stats = emptyStats()
@@ -79,6 +83,8 @@
     <button class="danger" onclick={reset}>Reset stats</button>
   </div>
 
+  {@render summary(total)}
+
   {#if attempts(wordTotal)}
     <div class="section-head">
       <h2>
@@ -88,7 +94,6 @@
       </h2>
     </div>
     {#if showWords}
-    {@render summary(wordTotal)}
     <ul class="words">
       {#each wordRows as { word, tally } (word.id)}
         <li>
@@ -111,7 +116,6 @@
       </h2>
     </div>
     {#if showKana}
-    {@render summary(kanaTotal)}
     {#each kanaRows as script (script.id)}
       <h3>{script.label}</h3>
       <ul class="words">
