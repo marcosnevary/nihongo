@@ -338,8 +338,6 @@
   .leader {
     flex: 1;
     min-width: 16px;
-    align-self: flex-end;
-    margin-bottom: 0.5em;
     border-bottom: 2px solid var(--muted);
   }
   .jp {
