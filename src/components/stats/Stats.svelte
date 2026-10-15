@@ -205,7 +205,7 @@
     gap: 12px;
     padding: 10px 12px;
     margin-bottom: 6px;
-    background: var(--surface);
+    border: 2px solid var(--muted);
   }
   .jp {
     font-size: 1.2rem;
@@ -216,7 +216,6 @@
   .badge {
     min-width: 52px;
     padding: 2px 8px;
-    background: var(--bg);
     font-weight: 700;
     text-align: center;
   }
