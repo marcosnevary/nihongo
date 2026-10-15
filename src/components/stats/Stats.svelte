@@ -333,7 +333,7 @@
     line-height: 1.3;
     /* fixed width so the dotted line always ends at the same x, whatever the numbers */
     flex: none;
-    width: 7ch;
+    width: 5ch;
     font-size: 0.8rem;
     font-variant-numeric: tabular-nums;
   }
