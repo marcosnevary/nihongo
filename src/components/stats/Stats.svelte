@@ -1,39 +1,76 @@
 <script lang="ts">
   import { toRomaji } from 'wanakana'
   import { symbolOf, type KanaScript } from '../../core/kana'
-  import { emptyStats, STATS_SORT_OPTIONS, accuracy, attempts, percent, sortTallies, sumTallies, type StatsSort } from '../../data/stats'
+  import {
+    emptyStats,
+    STATS_SORT_OPTIONS,
+    accuracy,
+    attempts,
+    percent,
+    sortTallies,
+    sumTallies,
+    type StatsSort,
+    type StatsSortDirection,
+  } from '../../data/stats'
   import type { Stats, Tally, Word } from '../../core/types'
 
   let { words, stats = $bindable() }: { words: Word[]; stats: Stats } = $props()
 
-  let sort = $state<StatsSort>('misses')
-  let showWords = $state(true)
-  let showKana = $state(true)
-
-  const byId = $derived(new Map(words.map((w) => [w.id, w])))
-  // stats of deleted words stay saved but are not listed
-  const wordRows = $derived(
-    sortTallies(Object.entries(stats.words).filter(([id]) => byId.has(id)), sort).map(
-      ([id, tally]) => ({ word: byId.get(id)!, tally }),
-    ),
-  )
-  const SCRIPTS: { id: KanaScript; label: string }[] = [
+  type Kind = 'words' | KanaScript
+  const KINDS: { id: Kind; label: string }[] = [
+    { id: 'words', label: 'Words' },
     { id: 'hiragana', label: 'Hiragana' },
     { id: 'katakana', label: 'Katakana' },
   ]
-  // kana keys look like "katakana:か" (see kanaKey)
-  const kanaRows = $derived(
-    SCRIPTS.map((script) => ({
-      ...script,
-      rows: sortTallies(
-        Object.entries(stats.kana).filter(([key]) => key.startsWith(`${script.id}:`)),
-        sort,
-      ).map(([key, tally]) => {
-        const hiragana = key.slice(script.id.length + 1)
-        return { key, symbol: symbolOf(script.id, hiragana), romaji: toRomaji(hiragana), tally }
-      }),
-    })).filter((script) => script.rows.length),
-  )
+  type Row = { key: string; kind: Kind; symbol: string; reading: string; search: string; ja: boolean; tally: Tally }
+
+  let query = $state('')
+  let sort = $state<StatsSort>('misses')
+  let direction = $state<StatsSortDirection>('desc')
+  let showFilters = $state(false)
+  let kinds = $state<Record<Kind, boolean>>({ words: true, hiragana: true, katakana: true })
+
+  const byId = $derived(new Map(words.map((w) => [w.id, w])))
+  // stats of deleted words stay saved but are not listed; kana keys look like "katakana:か" (see kanaKey)
+  const rows = $derived.by(() => {
+    const all = new Map<string, Row>()
+    for (const [id, tally] of Object.entries(stats.words)) {
+      const word = byId.get(id)
+      if (!word) continue
+      all.set(`word:${id}`, {
+        key: `word:${id}`,
+        kind: 'words',
+        symbol: word.japanese,
+        reading: word.hiragana,
+        search: `${word.japanese} ${word.hiragana} ${toRomaji(word.hiragana)} ${word.meaning ?? ''}`.toLowerCase(),
+        ja: true,
+        tally,
+      })
+    }
+    for (const [key, tally] of Object.entries(stats.kana)) {
+      const script = KINDS.find((k) => k.id !== 'words' && key.startsWith(`${k.id}:`))
+      if (!script) continue
+      const hiragana = key.slice(script.id.length + 1)
+      const romaji = toRomaji(hiragana)
+      const symbol = symbolOf(script.id as KanaScript, hiragana)
+      all.set(key, {
+        key,
+        kind: script.id,
+        symbol,
+        reading: `${script.label} · ${romaji}`,
+        search: `${symbol} ${hiragana} ${romaji}`.toLowerCase(),
+        ja: false,
+        tally,
+      })
+    }
+    return all
+  })
+  const visibleRows = $derived.by(() => {
+    const q = query.trim().toLowerCase()
+    const matches = [...rows.values()].filter((r) => kinds[r.kind] && (!q || r.search.includes(q)))
+    return sortTallies(matches.map((r) => [r.key, r.tally]), sort, direction).map(([key]) => rows.get(key)!)
+  })
+  const activeFilters = $derived(KINDS.filter((k) => !kinds[k.id]).length)
 
   const wordTotal = $derived(sumTallies(stats.words))
   const kanaTotal = $derived(sumTallies(stats.kana))
@@ -72,65 +109,69 @@
   <p class="muted">No statistics yet. Answer some words or kana in Practice and they will show up here.</p>
 {:else}
   <div class="toolbar">
-    <label>
-      Sort by
-      <select bind:value={sort}>
-        {#each STATS_SORT_OPTIONS as option (option.key)}
-          <option value={option.key}>{option.label}</option>
-        {/each}
-      </select>
-    </label>
     <button class="danger" onclick={reset}>Reset stats</button>
   </div>
 
   {@render summary(total)}
 
-  {#if attempts(wordTotal)}
-    <div class="section-head">
-      <h2>
-        <button class="toggle" onclick={() => (showWords = !showWords)} aria-expanded={showWords}>
-          <span aria-hidden="true">{showWords ? '▾' : '▸'}</span> Words
-        </button>
-      </h2>
+  <h2>Practiced ({visibleRows.length === rows.size ? rows.size : `${visibleRows.length} of ${rows.size}`})</h2>
+  <div class="toolbar">
+    <input
+      type="search"
+      class="search"
+      placeholder="Search by word, reading, romaji or meaning"
+      aria-label="Search stats"
+      bind:value={query}
+    />
+    <button class="filters" onclick={() => (showFilters = !showFilters)} aria-expanded={showFilters}>
+      Filters{activeFilters ? ` (${activeFilters})` : ''}
+    </button>
+    <div class="sort">
+      <select bind:value={sort} aria-label="Sort by">
+        {#each STATS_SORT_OPTIONS as option (option.key)}
+          <option value={option.key}>{option.label}</option>
+        {/each}
+      </select>
+      <button
+        class="icon no-hover"
+        onclick={() => (direction = direction === 'asc' ? 'desc' : 'asc')}
+        aria-label={direction === 'asc' ? 'Ascending' : 'Descending'}
+        title={direction === 'asc' ? 'Ascending (click to reverse)' : 'Descending (click to reverse)'}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          {#if direction === 'asc'}
+            <path d="M12 19V5M5 12l7-7 7 7" />
+          {:else}
+            <path d="M12 5v14M5 12l7 7 7-7" />
+          {/if}
+        </svg>
+      </button>
     </div>
-    {#if showWords}
-    <ul class="words">
-      {#each wordRows as { word, tally } (word.id)}
-        <li>
-          <span class="jp" lang="ja">{word.japanese}</span>
-          <span class="reading muted" lang="ja">{word.hiragana}</span>
-          <span class="counts">✓{tally.hits} ✗{tally.misses}</span>
-          <span class="badge">{percent(accuracy(tally))}</span>
-        </li>
+  </div>
+  {#if showFilters}
+    <div class="row filter-panel">
+      {#each KINDS as kind (kind.id)}
+        <label class="check">
+          <input type="checkbox" bind:checked={kinds[kind.id]} />
+          {kind.label}
+        </label>
       {/each}
-    </ul>
-    {/if}
+    </div>
   {/if}
 
-  {#if attempts(kanaTotal)}
-    <div class="section-head">
-      <h2>
-        <button class="toggle" onclick={() => (showKana = !showKana)} aria-expanded={showKana}>
-          <span aria-hidden="true">{showKana ? '▾' : '▸'}</span> Kana
-        </button>
-      </h2>
-    </div>
-    {#if showKana}
-    {#each kanaRows as script (script.id)}
-      <h3>{script.label}</h3>
-      <ul class="words">
-        {#each script.rows as { key, symbol, romaji, tally } (key)}
-          <li>
-            <span class="jp" lang="ja">{symbol}</span>
-            <span class="reading muted">{romaji}</span>
-            <span class="counts">✓{tally.hits} ✗{tally.misses}</span>
-            <span class="badge">{percent(accuracy(tally))}</span>
-          </li>
-        {/each}
-      </ul>
-    {/each}
-    {/if}
+  {#if visibleRows.length === 0}
+    <p class="muted">Nothing matches your search and filters.</p>
   {/if}
+  <ul class="words">
+    {#each visibleRows as row (row.key)}
+      <li>
+        <span class="jp" lang="ja">{row.symbol}</span>
+        <span class="reading muted" lang={row.ja ? 'ja' : undefined}>{row.reading}</span>
+        <span class="counts">✓{row.tally.hits} ✗{row.tally.misses}</span>
+        <span class="badge">{percent(accuracy(row.tally))}</span>
+      </li>
+    {/each}
+  </ul>
 {/if}
 
 <style>
@@ -160,38 +201,79 @@
     font-size: 0.8rem;
     color: var(--muted);
   }
-  .section-head {
-    margin-top: 24px;
-  }
-  .section-head h2 {
-    margin: 0;
-  }
-  .toggle {
-    display: block;
-    width: 100%;
-    padding: 4px 0;
-    font: inherit;
-    font-weight: inherit;
-    text-align: left;
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
   .toolbar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-top: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0 8px;
+  }
+  .toolbar:has(.danger) {
+    justify-content: flex-end;
+  }
+  h2 {
+    margin: 24px 0 0;
+  }
+  .search,
+  select {
+    border: 2px solid var(--muted);
+    background-color: var(--surface);
+  }
+  .search {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px 12px;
+    appearance: none;
+  }
+  .search:focus-visible,
+  select:focus-visible {
+    outline: none;
+    border-color: var(--accent);
   }
   select {
-    padding: 8px 10px;
-    background: var(--surface);
+    /* custom chevron so the arrow keeps its distance from the border */
+    padding: 9px 36px 9px 10px;
+    appearance: none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--text) 50%),
+      linear-gradient(135deg, var(--text) 50%, transparent 50%);
+    background-position:
+      calc(100% - 19px) 50%,
+      calc(100% - 13px) 50%;
+    background-size: 6px 6px;
+    background-repeat: no-repeat;
   }
-  h3 {
-    margin: 16px 0 8px;
-    font-size: 0.95rem;
-    color: var(--muted);
+  .sort {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .filter-panel {
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .check {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  button.icon {
+    display: inline-flex;
+    padding: 6px;
+  }
+  button.icon svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
   ul {
     list-style: none;
