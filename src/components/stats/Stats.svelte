@@ -142,7 +142,7 @@
     align-items: center;
     padding: 10px 6px;
     background: var(--surface);
-    border: 2px solid var(--text);
+    border: 2px solid var(--muted);
   }
   .tile .value {
     font-family: var(--font-serif);
