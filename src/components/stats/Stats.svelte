@@ -201,7 +201,7 @@
     padding: 10px 6px;
     background: var(--surface);
     border: 2px solid var(--text);
-    color: var(--muted);
+    color: var(--text);
   }
   .tile .value {
     font-family: var(--font-serif);
@@ -212,7 +212,7 @@
   }
   .tile .label {
     font-size: 0.8rem;
-    color: var(--muted);
+    color: inherit;
   }
   .toolbar {
     display: flex;
