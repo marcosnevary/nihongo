@@ -335,7 +335,7 @@
     flex: none;
     width: 5ch;
     /* pulls the counts toward the accuracy column */
-    margin-right: -20px;
+    margin-right: -28px;
     font-size: 0.8rem;
     font-variant-numeric: tabular-nums;
   }
