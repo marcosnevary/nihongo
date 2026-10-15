@@ -38,12 +38,6 @@
   const wordTotal = $derived(sumTallies(stats.words))
   const kanaTotal = $derived(sumTallies(stats.kana))
 
-  /** good / ok / poor, always shown together with the percentage text */
-  function level(tally: Tally): 'ok' | 'warn' | 'bad' {
-    const a = accuracy(tally) ?? 0
-    return a >= 0.8 ? 'ok' : a >= 0.5 ? 'warn' : 'bad'
-  }
-
   function reset() {
     if (confirm('Reset all statistics? This cannot be undone.')) stats = emptyStats()
   }
@@ -51,15 +45,15 @@
 
 {#snippet summary(tally: Tally)}
   <section class="summary">
-    <div class="tile ok">
+    <div class="tile">
       <span class="value">{tally.hits}</span>
       <span class="label">Correct</span>
     </div>
-    <div class="tile bad">
+    <div class="tile">
       <span class="value">{tally.misses}</span>
       <span class="label">Wrong</span>
     </div>
-    <div class="tile {level(tally)}">
+    <div class="tile">
       <span class="value">{percent(accuracy(tally))}</span>
       <span class="label">Accuracy</span>
     </div>
@@ -101,7 +95,7 @@
           <span class="jp" lang="ja">{word.japanese}</span>
           <span class="reading muted" lang="ja">{word.hiragana}</span>
           <span class="counts">✓{tally.hits} ✗{tally.misses}</span>
-          <span class="badge {level(tally)}">{percent(accuracy(tally))}</span>
+          <span class="badge">{percent(accuracy(tally))}</span>
         </li>
       {/each}
     </ul>
@@ -126,7 +120,7 @@
             <span class="jp" lang="ja">{symbol}</span>
             <span class="reading muted">{romaji}</span>
             <span class="counts">✓{tally.hits} ✗{tally.misses}</span>
-            <span class="badge {level(tally)}">{percent(accuracy(tally))}</span>
+            <span class="badge">{percent(accuracy(tally))}</span>
           </li>
         {/each}
       </ul>
@@ -148,6 +142,7 @@
     align-items: center;
     padding: 10px 6px;
     background: var(--surface);
+    border: 2px solid var(--text);
   }
   .tile .value {
     font-family: var(--font-serif);
@@ -159,23 +154,6 @@
   .tile .label {
     font-size: 0.8rem;
     color: var(--muted);
-  }
-  .ok {
-    background: var(--ok-bg);
-    color: var(--ok);
-  }
-  .warn {
-    background: var(--warn-bg);
-    color: var(--warn);
-  }
-  .bad {
-    background: var(--bad-bg);
-    color: var(--bad);
-  }
-  .tile.ok .label,
-  .tile.warn .label,
-  .tile.bad .label {
-    color: inherit;
   }
   .section-head {
     margin-top: 24px;
@@ -237,7 +215,7 @@
   .badge {
     min-width: 52px;
     padding: 2px 8px;
-    background: color-mix(in srgb, currentColor 15%, transparent);
+    background: var(--bg);
     font-weight: 700;
     text-align: center;
   }
