@@ -186,6 +186,7 @@
       <li>
         <span class="jp" lang="ja">{row.symbol}</span>
         <span class="reading muted" lang={row.ja ? 'ja' : undefined}>{row.reading}</span>
+        <span class="leader" aria-hidden="true"></span>
         <span class="counts">✓{row.tally.hits} ✗{row.tally.misses}</span>
         <span class="badge {level(row.tally)}">{percent(accuracy(row.tally))}</span>
       </li>
@@ -328,13 +329,18 @@
     font-variant-numeric: tabular-nums;
   }
   .words li {
-    display: grid;
-    grid-template-columns: 1fr auto auto auto;
+    display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 12px;
-    margin-bottom: 6px;
-    border: 2px solid var(--text);
+    padding: 10px 0;
+  }
+  /* dotted line that runs from the symbol to the counts on the other side */
+  .leader {
+    flex: 1;
+    min-width: 16px;
+    align-self: flex-end;
+    margin-bottom: 0.5em;
+    border-bottom: 2px dotted var(--muted);
   }
   .jp {
     font-size: 1.2rem;
@@ -347,13 +353,5 @@
     padding: 2px 8px;
     font-weight: 700;
     text-align: center;
-  }
-  @media (max-width: 480px) {
-    .words li {
-      grid-template-columns: 1fr auto;
-    }
-    .reading {
-      grid-column: 1;
-    }
   }
 </style>
