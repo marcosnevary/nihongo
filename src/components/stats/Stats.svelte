@@ -57,7 +57,7 @@
         key,
         kind: script.id,
         symbol,
-        reading: `${script.label} · ${romaji}`,
+        reading: romaji,
         search: `${symbol} ${hiragana} ${romaji}`.toLowerCase(),
         ja: false,
         tally,
