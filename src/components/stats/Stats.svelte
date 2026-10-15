@@ -200,7 +200,7 @@
     align-items: center;
     padding: 10px 6px;
     background: var(--surface);
-    border: 2px solid var(--muted);
+    border: 2px solid var(--text);
     color: var(--muted);
   }
   .tile .value {
@@ -322,7 +322,7 @@
     gap: 12px;
     padding: 10px 12px;
     margin-bottom: 6px;
-    border: 2px solid var(--muted);
+    border: 2px solid var(--text);
   }
   .jp {
     font-size: 1.2rem;
