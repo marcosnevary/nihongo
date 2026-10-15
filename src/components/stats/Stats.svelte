@@ -331,6 +331,9 @@
     display: flex;
     flex-direction: column;
     line-height: 1.3;
+    /* fixed width so the dotted line always ends at the same x, whatever the numbers */
+    flex: none;
+    width: 7ch;
     font-size: 0.8rem;
     font-variant-numeric: tabular-nums;
   }
@@ -354,8 +357,10 @@
     font-size: 0.9rem;
   }
   .badge {
-    min-width: 52px;
-    padding: 2px 8px;
+    flex: none;
+    width: 64px;
+    padding: 2px 0;
+    font-variant-numeric: tabular-nums;
     font-weight: 700;
     text-align: center;
   }
