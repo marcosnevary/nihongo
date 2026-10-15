@@ -334,13 +334,13 @@
     gap: 12px;
     padding: 10px 0;
   }
-  /* dotted line that runs from the symbol to the counts on the other side */
+  /* straight line that runs from the symbol to the counts on the other side */
   .leader {
     flex: 1;
     min-width: 16px;
     align-self: flex-end;
     margin-bottom: 0.5em;
-    border-bottom: 2px dotted var(--muted);
+    border-bottom: 2px solid var(--muted);
   }
   .jp {
     font-size: 1.2rem;
