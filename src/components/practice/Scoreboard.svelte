@@ -54,8 +54,8 @@
     align-items: center;
     padding: 10px 6px;
     background: var(--surface);
-    border: 2px solid var(--muted);
-    color: var(--muted);
+    border: 2px solid var(--text);
+    color: var(--text);
   }
   .value {
     font-family: var(--font-serif);
@@ -66,7 +66,7 @@
   }
   .label {
     font-size: 0.8rem;
-    color: var(--muted);
+    color: inherit;
     text-align: center;
   }
   .footer {
