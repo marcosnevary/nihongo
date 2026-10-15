@@ -334,11 +334,12 @@
     gap: 12px;
     padding: 10px 0;
   }
-  /* straight line that runs from the symbol to the counts on the other side */
+  /* row of round, widely spaced dots that runs from the symbol to the counts on the other side */
   .leader {
     flex: 1;
     min-width: 16px;
-    border-bottom: 2px solid var(--muted);
+    height: 4px;
+    background: radial-gradient(circle at center, var(--muted) 1.5px, transparent 2px) left center / 12px 4px repeat-x;
   }
   .jp {
     font-size: 1.2rem;
