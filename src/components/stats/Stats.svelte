@@ -131,8 +131,13 @@
       bind:value={query}
     />
     <div class="filters">
-      <button onclick={() => (showFilters = !showFilters)} aria-expanded={showFilters} aria-haspopup="true">
-        Filters{activeFilters ? ` (${activeFilters})` : ''} <span aria-hidden="true">▾</span>
+      <button
+        class="filters-btn no-hover"
+        onclick={() => (showFilters = !showFilters)}
+        aria-expanded={showFilters}
+        aria-haspopup="true"
+      >
+        Filters{activeFilters ? ` (${activeFilters})` : ''}
       </button>
       {#if showFilters}
         <div class="menu" role="group" aria-label="Filters">
@@ -223,7 +228,8 @@
     margin: 24px 0 0;
   }
   .search,
-  select {
+  select,
+  .filters-btn {
     border: 2px solid var(--muted);
     background-color: var(--surface);
   }
@@ -234,11 +240,13 @@
     appearance: none;
   }
   .search:focus-visible,
-  select:focus-visible {
+  select:focus-visible,
+  .filters-btn:focus-visible {
     outline: none;
     border-color: var(--accent);
   }
-  select {
+  select,
+  .filters-btn {
     /* custom chevron so the arrow keeps its distance from the border */
     padding: 9px 36px 9px 10px;
     appearance: none;
@@ -255,6 +263,11 @@
     display: flex;
     gap: 8px;
     align-items: center;
+  }
+  .filters-btn {
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
   }
   .filters {
     position: relative;
