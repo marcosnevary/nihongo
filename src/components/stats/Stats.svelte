@@ -105,6 +105,13 @@
   </section>
 {/snippet}
 
+<svelte:window
+  onclick={(e) => {
+    if (showFilters && !(e.target as Element).closest('.filters')) showFilters = false
+  }}
+  onkeydown={(e) => e.key === 'Escape' && (showFilters = false)}
+/>
+
 {#if !attempts(wordTotal) && !attempts(kanaTotal)}
   <p class="muted">No statistics yet. Answer some words or kana in Practice and they will show up here.</p>
 {:else}
@@ -123,9 +130,21 @@
       aria-label="Search stats"
       bind:value={query}
     />
-    <button class="filters" onclick={() => (showFilters = !showFilters)} aria-expanded={showFilters}>
-      Filters{activeFilters ? ` (${activeFilters})` : ''}
-    </button>
+    <div class="filters">
+      <button onclick={() => (showFilters = !showFilters)} aria-expanded={showFilters} aria-haspopup="true">
+        Filters{activeFilters ? ` (${activeFilters})` : ''} <span aria-hidden="true">▾</span>
+      </button>
+      {#if showFilters}
+        <div class="menu" role="group" aria-label="Filters">
+          {#each KINDS as kind (kind.id)}
+            <label class="check">
+              <input type="checkbox" bind:checked={kinds[kind.id]} />
+              {kind.label}
+            </label>
+          {/each}
+        </div>
+      {/if}
+    </div>
     <div class="sort">
       <select bind:value={sort} aria-label="Sort by">
         {#each STATS_SORT_OPTIONS as option (option.key)}
@@ -148,17 +167,6 @@
       </button>
     </div>
   </div>
-  {#if showFilters}
-    <div class="row filter-panel">
-      {#each KINDS as kind (kind.id)}
-        <label class="check">
-          <input type="checkbox" bind:checked={kinds[kind.id]} />
-          {kind.label}
-        </label>
-      {/each}
-    </div>
-  {/if}
-
   {#if visibleRows.length === 0}
     <p class="muted">Nothing matches your search and filters.</p>
   {/if}
@@ -248,19 +256,26 @@
     gap: 8px;
     align-items: center;
   }
-  .filter-panel {
-    gap: 16px;
-    margin-bottom: 8px;
+  .filters {
+    position: relative;
+  }
+  .menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 160px;
+    padding: 12px;
+    background: var(--surface);
+    border: 2px solid var(--muted);
   }
   .check {
     display: flex;
     align-items: center;
     gap: 6px;
-  }
-  .row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
   }
   button.icon {
     display: inline-flex;
