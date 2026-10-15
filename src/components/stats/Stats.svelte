@@ -230,13 +230,14 @@
   .search,
   select,
   .filters-btn {
+    height: 44px;
     border: 2px solid var(--muted);
     background-color: var(--surface);
   }
   .search {
     flex: 1;
     min-width: 200px;
-    padding: 10px 12px;
+    padding: 0 12px;
     appearance: none;
   }
   .search:focus-visible,
@@ -248,7 +249,7 @@
   select,
   .filters-btn {
     /* custom chevron so the arrow keeps its distance from the border */
-    padding: 9px 36px 9px 10px;
+    padding: 0 36px 0 10px;
     appearance: none;
     background-image:
       linear-gradient(45deg, transparent 50%, var(--text) 50%),
@@ -265,6 +266,8 @@
     align-items: center;
   }
   .filters-btn {
+    /* fixed width so the label ("Filters (2)") never resizes the button */
+    width: 132px;
     font: inherit;
     text-align: left;
     cursor: pointer;
