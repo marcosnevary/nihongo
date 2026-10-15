@@ -75,15 +75,12 @@
     text-align: center;
   }
   .tile.ok {
-    background: var(--on-bg);
     color: var(--on);
   }
   .tile.warn {
-    background: var(--warn-bg);
     color: var(--warn);
   }
   .tile.bad {
-    background: var(--off-bg);
     color: var(--off);
   }
   .tile.ok .label,
