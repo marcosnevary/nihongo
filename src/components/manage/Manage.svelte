@@ -375,11 +375,10 @@
     /* custom chevron so the arrow keeps its distance from the border */
     padding: 9px 36px 9px 10px;
     appearance: none;
-    color: var(--muted);
     background-color: var(--surface);
     background-image:
-      linear-gradient(45deg, transparent 50%, var(--muted) 50%),
-      linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+      linear-gradient(45deg, transparent 50%, var(--text) 50%),
+      linear-gradient(135deg, var(--text) 50%, transparent 50%);
     background-position:
       calc(100% - 19px) 50%,
       calc(100% - 13px) 50%;
@@ -506,10 +505,6 @@
   button.icon {
     display: inline-flex;
     padding: 6px;
-  }
-  /* the sort-direction arrow uses the same gray as the sort select */
-  button.icon.no-hover {
-    color: var(--muted);
   }
   button.icon svg {
     width: 20px;

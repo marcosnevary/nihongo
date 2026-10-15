@@ -255,10 +255,9 @@
     /* custom chevron so the arrow keeps its distance from the border */
     padding: 0 36px 0 10px;
     appearance: none;
-    color: var(--muted);
     background-image:
-      linear-gradient(45deg, transparent 50%, var(--muted) 50%),
-      linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+      linear-gradient(45deg, transparent 50%, var(--text) 50%),
+      linear-gradient(135deg, var(--text) 50%, transparent 50%);
     background-position:
       calc(100% - 19px) 50%,
       calc(100% - 13px) 50%;
@@ -301,7 +300,6 @@
   button.icon {
     display: inline-flex;
     padding: 6px;
-    color: var(--muted);
   }
   button.icon svg {
     width: 20px;
