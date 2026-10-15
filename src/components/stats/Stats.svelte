@@ -187,7 +187,10 @@
         <span class="jp" lang="ja">{row.symbol}</span>
         <span class="reading muted" lang={row.ja ? 'ja' : undefined}>{row.reading}</span>
         <span class="leader" aria-hidden="true"></span>
-        <span class="counts">✓{row.tally.hits} ✗{row.tally.misses}</span>
+        <span class="counts">
+          <span>✓{row.tally.hits}</span>
+          <span>✗{row.tally.misses}</span>
+        </span>
         <span class="badge {level(row.tally)}">{percent(accuracy(row.tally))}</span>
       </li>
     {/each}
@@ -325,6 +328,9 @@
     padding: 0;
   }
   .counts {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
     font-size: 0.8rem;
     font-variant-numeric: tabular-nums;
   }
