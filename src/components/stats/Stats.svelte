@@ -325,11 +325,11 @@
     padding: 0;
   }
   .counts {
-    /* fixed width, right-aligned, so every row's correct/wrong counts end at the same x */
+    /* fixed width, left-aligned, so every row's correct/wrong counts start at the same x */
     width: 11ch;
     font-size: 0.8rem;
     font-variant-numeric: tabular-nums;
-    text-align: right;
+    text-align: left;
   }
   .words li {
     display: flex;
